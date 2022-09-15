@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Git clone') {
+            steps {
+                git branch: 'main', url: 'https://github.com/kkvku/cert_test16.git'
+            }
+        }
+
+        stage('Copy file with variables') {
+            steps {
+                sh 'cp /home/test/proj/variables.tf /var/lib/jenkins/workspace/proj_pipeline_main/'
+            }
+        }
+
+        stage('Terraform init') {
+            steps {
+                sh 'type terraform'
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                sh 'terraform apply -auto-approve'
+            }
+        }
+    }
+}

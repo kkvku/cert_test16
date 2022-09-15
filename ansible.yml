@@ -1,0 +1,16 @@
+---
+version: '3'
+services:
+  maven:
+    build: maven
+    volumes:
+      - maven:/test/boxfuse-sample-java-war-hello/target/
+  tomcat:
+    image: tomcat:9.0-jre8-alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - maven:/usr/local/tomcat/webapps
+volumes:
+  maven:
+---
