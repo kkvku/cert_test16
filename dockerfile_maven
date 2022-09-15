@@ -1,6 +1,0 @@
-FROM maven:3.8.6-openjdk-11
-WORKDIR /home/cert/maven
-RUN git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git \
-    && mv boxfuse-sample-java-war-hello/* /home/cert/maven
-RUN mvn package
-VOLUME ./:/home/cert/maven/target/
