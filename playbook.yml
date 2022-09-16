@@ -46,7 +46,7 @@
   become: yes
 
   tasks:
-    - name: ensure tomcat8 and mc is present
+    - name: ensure tomcat8
       apt:
         name: "{{ packages }}"
         state: present
