@@ -1,0 +1,65 @@
+---
+- name: prepare instances
+  hosts: all
+  gather_facts: false
+  pre_tasks:
+    - name: preinstall python
+      become: yes
+      raw: apt update && apt install python -y
+
+- name: prepare instance for build
+  hosts: buildinstance
+  become: yes
+  tasks:
+
+    - name: update apt cache
+      apt:
+        update_cache: yes
+
+    - name: ensure maven, git, jdk
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - maven
+          - git
+          - default-jdk
+
+    - name: clone boxfuse git repository
+      git:
+        repo: 'https://github.com/boxfuse/boxfuse-sample-java-war-hello.git'
+        dest: /home/test/boxfuse/
+        clone: yes
+
+    - name: build the project
+      shell: mvn -f /home/test/boxfuse/pom.xml package
+
+    - name: fetch war to server
+      fetch:
+        src: /home/test/boxfuse/target/hello-1.0.war
+        dest: /tmp/
+        flat: yes
+
+- name: run war in deployinstance
+  hosts: deployinstance
+  become: yes
+
+  tasks:
+    - name: ensure tomcat8 and mc is present
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - tomcat8
+
+    - name: copy war to prod
+      copy:
+        src: /tmp/hello-1.0.war
+        dest: /var/lib/tomcat8/webapps/
+
+    - name: restart tomcat8
+      service:
+        name: tomcat8
+        state: restarted
